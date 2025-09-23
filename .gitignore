@@ -39,3 +39,6 @@
 
 # debug information files
 *.dwo
+
+# binary
+./show_proc/show_proc
