@@ -42,3 +42,8 @@
 
 # binary
 ./show_proc/show_proc
+
+# build
+build/
+build*/
+
