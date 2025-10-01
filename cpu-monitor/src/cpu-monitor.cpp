@@ -77,7 +77,11 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::string &line) {
 
   double total_cpu_usage = 100 * (total_diff - idle_diff) / (double)total_diff;
 
+  printf("\033[H");
+  printf("=== System Monitor ===\n");
   printf("Total CPU Usage: %.2f[%%]\n", total_cpu_usage);
+  printf("Press Ctrl+C to exit\n");
+  fflush(stdout);
 
   // update
   cpu_stat_prev = cpu_stat_now;
