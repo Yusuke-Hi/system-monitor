@@ -8,13 +8,13 @@
 
 struct CPUStat {
   std::string cpu_name;
-  size_t user;
-  size_t nice;
-  size_t system;
-  size_t idle;
-  size_t iowait;
-  size_t irq;
-  size_t softirq;
+  int user;
+  int nice;
+  int system;
+  int idle;
+  int iowait;
+  int irq;
+  int softirq;
 };
 
 class CPUMonitor {
@@ -30,6 +30,12 @@ class CPUMonitor {
   CPUStat GetCPUStat_(const std::string &line);
   std::vector<std::string> SplitLine_(const std::string &line);
 
+  void ShowTotalCPUUsage_(const std::string &line);
+  int GetTotalLoad_(const CPUStat &cpu_stat);
+
   // variables
   const std::string path{"/proc/stat"};
+  bool time_zero{true};
+  CPUStat cpu_stat_prev{};
+  CPUStat cpu_stat_now{};
 };
