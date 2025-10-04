@@ -4,6 +4,7 @@ CPUMonitor::CPUMonitor() {}
 CPUMonitor::~CPUMonitor() {}
 
 void CPUMonitor::Monitor() {
+  printf("\033[2J\033[H");
   while (true) {
     ShowCPULoad_();
     usleep(1000000);
@@ -11,24 +12,23 @@ void CPUMonitor::Monitor() {
 }
 
 void CPUMonitor::ShowCPULoad_() {
-  std::string line = GetFirstLine_();
+  std::vector<std::string> lines = GetLines_();
 
-  ShowTotalCPUUsage_(line);
-
-  // printf(
-  //     "cpu_name: %s\nuser: %zu, nice: %zu, system: %zu, idle: %zu, iowait: "
-  //     "%zu, irq: %zu, softirq: %zu\n",
-  //     cpu_stat.cpu_name.c_str(), cpu_stat.user, cpu_stat.nice,
-  //     cpu_stat.system, cpu_stat.idle, cpu_stat.iowait, cpu_stat.irq,
-  //     cpu_stat.softirq);
+  ShowTotalCPUUsage_(lines);
 }
 
-std::string CPUMonitor::GetFirstLine_() {
+std::vector<std::string> CPUMonitor::GetLines_() {
   std::ifstream file(path.c_str());
-  std::string line;
 
-  std::getline(file, line);
-  return line;
+  std::vector<std::string> lines;
+  std::string line;
+  while (std::getline(file, line)) {
+    if (line.at(0) == 'c' && line.at(1) == 'p' && line.at(2) == 'u') {
+      lines.emplace_back(line);
+    }
+  }
+
+  return lines;
 }
 
 CPUStat CPUMonitor::GetCPUStat_(const std::string &line) {
@@ -53,6 +53,7 @@ std::vector<std::string> CPUMonitor::SplitLine_(const std::string &line) {
   for (auto c : line) {
     if (c == ' ') {
       if (tmp != "") {
+        // std::cout << tmp << std::endl;
         line_split.emplace_back(tmp);
       }
       tmp = "";
@@ -64,27 +65,44 @@ std::vector<std::string> CPUMonitor::SplitLine_(const std::string &line) {
   return line_split;
 }
 
-void CPUMonitor::ShowTotalCPUUsage_(const std::string &line) {
-  cpu_stat_now = GetCPUStat_(line);
+void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string> &lines) {
+  std::vector<CPUStat> cpu_stat_now_vector;
+  for (auto line : lines) {
+    cpu_stat_now_vector.emplace_back(GetCPUStat_(line));
+  }
+
   if (time_zero) {
-    cpu_stat_prev = cpu_stat_now;
+    for (auto cpu_stat : cpu_stat_now_vector) {
+      cpu_stat_prev_vector.emplace_back(cpu_stat);
+    }
     time_zero = false;
     return;
   }
-  // get total
-  int total_diff = GetTotalLoad_(cpu_stat_now) - GetTotalLoad_(cpu_stat_prev);
-  int idle_diff = cpu_stat_now.idle - cpu_stat_prev.idle;
-
-  double total_cpu_usage = 100 * (total_diff - idle_diff) / (double)total_diff;
 
   printf("\033[H");
   printf("=== System Monitor ===\n");
-  printf("Total CPU Usage: %.2f[%%]\n", total_cpu_usage);
-  printf("Press Ctrl+C to exit\n");
+
+  // get total
+  for (size_t i = 0; i < cpu_stat_now_vector.size(); ++i) {
+    int total_diff = GetTotalLoad_(cpu_stat_now_vector.at(i)) -
+                     GetTotalLoad_(cpu_stat_prev_vector.at(i));
+    int idle_diff =
+        cpu_stat_now_vector.at(i).idle - cpu_stat_prev_vector.at(i).idle;
+
+    double cpu_usage = 100 * (total_diff - idle_diff) / (double)total_diff;
+
+    printf("%s: %.2f[%%]\n", cpu_stat_now_vector.at(i).cpu_name.c_str(),
+           cpu_usage);
+  }
+
   fflush(stdout);
 
   // update
-  cpu_stat_prev = cpu_stat_now;
+  for (size_t i = 0; i < cpu_stat_now_vector.size(); ++i) {
+    cpu_stat_prev_vector.at(i) = cpu_stat_now_vector.at(i);
+  }
+
+  printf("Press Ctrl+C to exit\n");
 }
 
 int CPUMonitor::GetTotalLoad_(const CPUStat &cpu_stat) {

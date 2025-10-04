@@ -26,16 +26,16 @@ class CPUMonitor {
 
  private:
   void ShowCPULoad_();
-  std::string GetFirstLine_();
+  std::vector<std::string> GetLines_();
   CPUStat GetCPUStat_(const std::string &line);
   std::vector<std::string> SplitLine_(const std::string &line);
 
-  void ShowTotalCPUUsage_(const std::string &line);
+  void ShowTotalCPUUsage_(const std::vector<std::string> &line);
   int GetTotalLoad_(const CPUStat &cpu_stat);
 
   // variables
   const std::string path{"/proc/stat"};
   bool time_zero{true};
-  CPUStat cpu_stat_prev{};
-  CPUStat cpu_stat_now{};
+  std::vector<CPUStat> cpu_stat_prev_vector{};
+  std::vector<CPUStat> cpu_stat_now_vector{};
 };
