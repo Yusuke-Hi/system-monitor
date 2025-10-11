@@ -1,3 +1,6 @@
+#ifndef CPU_MONITOR_
+#define CPU_MONITOR_
+
 #include <unistd.h>
 
 #include <cstddef>
@@ -19,8 +22,8 @@ struct CPUStat {
 
 class CPUMonitor {
  public:
-  CPUMonitor();
-  ~CPUMonitor();
+  CPUMonitor() = default;
+  ~CPUMonitor() = default;
 
   void Monitor();
 
@@ -39,3 +42,5 @@ class CPUMonitor {
   std::vector<CPUStat> cpu_stat_prev_vector{};
   std::vector<CPUStat> cpu_stat_now_vector{};
 };
+
+#endif

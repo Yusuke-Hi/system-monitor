@@ -1,8 +1,5 @@
 #include "cpu-monitor.hpp"
 
-CPUMonitor::CPUMonitor() {}
-CPUMonitor::~CPUMonitor() {}
-
 void CPUMonitor::Monitor() {
   printf("\033[2J\033[H");
   while (true) {
