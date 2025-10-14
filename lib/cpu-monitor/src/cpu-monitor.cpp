@@ -1,12 +1,6 @@
 #include "cpu-monitor.hpp"
 
-void CPUMonitor::Monitor() {
-  printf("\033[2J\033[H");
-  while (true) {
-    ShowCPULoad_();
-    usleep(1000000);
-  }
-}
+void CPUMonitor::Monitor() { ShowCPULoad_(); }
 
 void CPUMonitor::ShowCPULoad_() {
   std::vector<std::string> lines = GetLines_();
@@ -50,7 +44,6 @@ std::vector<std::string> CPUMonitor::SplitLine_(const std::string &line) {
   for (auto c : line) {
     if (c == ' ') {
       if (tmp != "") {
-        // std::cout << tmp << std::endl;
         line_split.emplace_back(tmp);
       }
       tmp = "";
@@ -76,8 +69,7 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string> &lines) {
     return;
   }
 
-  printf("\033[H");
-  printf("=== System Monitor ===\n");
+  printf("=== CPU Monitor ===\n");
 
   // get total
   for (size_t i = 0; i < cpu_stat_now_vector.size(); ++i) {
@@ -98,8 +90,6 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string> &lines) {
   for (size_t i = 0; i < cpu_stat_now_vector.size(); ++i) {
     cpu_stat_prev_vector.at(i) = cpu_stat_now_vector.at(i);
   }
-
-  printf("Press Ctrl+C to exit\n");
 }
 
 int CPUMonitor::GetTotalLoad_(const CPUStat &cpu_stat) {

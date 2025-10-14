@@ -1,12 +1,6 @@
 #include "memory-monitor.hpp"
 
-void MemoryMonitor::Monitor() {
-  printf("\033[2J\033[H");
-  while (true) {
-    ShowMemoryUsage();
-    usleep(1000000);
-  }
-}
+void MemoryMonitor::Monitor() { ShowMemoryUsage(); }
 
 void MemoryMonitor::ShowMemoryUsage() {
   StoreMemoryInfo();
@@ -26,7 +20,9 @@ void MemoryMonitor::ShowMainParts() {
   float usage = 100.0 *
                 (meminfo_map.at("MemTotal") - meminfo_map.at("MemAvailable")) /
                 meminfo_map.at("MemTotal");
-  printf("\033[H");
+
+  printf("=== Memory Monitor ===\n");
+
   printf(
       "Total:          %lld kB\n"
       "Available:      %lld kB\n"
