@@ -1,8 +1,6 @@
 #include "memory-monitor.hpp"
 
-void MemoryMonitor::Monitor() { ShowMemoryUsage(); }
-
-void MemoryMonitor::ShowMemoryUsage() {
+void MemoryMonitor::Monitor() {
   StoreMemoryInfo();
   ShowMainParts();
 }

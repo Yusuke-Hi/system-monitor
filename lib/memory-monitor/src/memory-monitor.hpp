@@ -17,11 +17,9 @@ class MemoryMonitor {
   void Monitor();
 
  private:
-  void ShowMemoryUsage();
   void StoreMemoryInfo();
-  void ShowMainParts();
-  float CaluculateUsage();
   void SaveToMap(const std::string& line);
+  void ShowMainParts();
 
   const std::string path{"/proc/meminfo"};
   std::unordered_map<std::string, long long> meminfo_map{};
