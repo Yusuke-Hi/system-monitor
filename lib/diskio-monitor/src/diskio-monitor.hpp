@@ -1,0 +1,43 @@
+#ifndef DISKIO_MONITOR_
+#define DISKIO_MONITOR_
+
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct DiskIOInfo {
+  uint32_t major;
+  uint32_t minor;
+  std::string name;
+  uint32_t reads;
+  uint32_t reads_merged;
+  unsigned long long sectors_read;
+  uint32_t time_reading;
+  uint32_t writes;
+  uint32_t writes_merged;
+  unsigned long long sectors_written;
+  uint32_t time_writing;
+};
+
+class DiskIOMonitor {
+ public:
+  DiskIOMonitor() = default;
+  ~DiskIOMonitor() = default;
+
+  void Monitor();
+
+ private:
+  void ShowDiskIO_();
+  std::vector<std::string> GetLines_();
+  DiskIOInfo GetDiskIOInfo_(const std::string& line);
+  std::vector<std::string> SplitLine_(const std::string& line);
+
+  const std::string path{"/proc/diskstats"};
+  bool first_time{true};
+  std::vector<std::string> target_names{"sda", "sdb", "sdc", "sdd"};
+  std::vector<DiskIOInfo> diskio_info_prev_vector{};
+  std::vector<DiskIOInfo> diskio_info_now_vector{};
+};
+
+#endif

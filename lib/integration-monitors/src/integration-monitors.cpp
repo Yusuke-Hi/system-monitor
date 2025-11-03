@@ -5,18 +5,20 @@ void IntegrationMonitors::StartMonitoring() {
 
   CPUMonitor cpu_monitor;
   MemoryMonitor memory_monitor;
+  DiskIOMonitor diskio_monitor;
 
-  bool first{false};
+  bool first{true};
 
   while (true) {
     printf("\033[H");
 
     cpu_monitor.Monitor();
-    if (!first) {
-      first = true;
+    if (first) {
+      first = false;
       continue;
     }
     memory_monitor.Monitor();
+    diskio_monitor.Monitor();
 
     usleep(1000000);
   }

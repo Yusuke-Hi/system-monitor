@@ -1,17 +1,11 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(integration-monitors)
+project(diskio-monitor CXX)
 
 add_library(${PROJECT_NAME} SHARED
-  src/integration-monitors.cpp
+  src/diskio-monitor.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-target_link_libraries(${PROJECT_NAME}
-  cpu-monitor
-  memory-monitor
-  diskio-monitor
 )

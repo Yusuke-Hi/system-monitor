@@ -30,11 +30,11 @@ class CPUMonitor {
  private:
   void ShowCPULoad_();
   std::vector<std::string> GetLines_();
-  CPUStat GetCPUStat_(const std::string &line);
-  std::vector<std::string> SplitLine_(const std::string &line);
+  CPUStat GetCPUStat_(const std::string& line);
+  std::vector<std::string> SplitLine_(const std::string& line);
 
-  void ShowTotalCPUUsage_(const std::vector<std::string> &line);
-  int GetTotalLoad_(const CPUStat &cpu_stat);
+  void ShowTotalCPUUsage_(const std::vector<std::string>& line);
+  int GetTotalLoad_(const CPUStat& cpu_stat);
 
   // variables
   const std::string path{"/proc/stat"};
