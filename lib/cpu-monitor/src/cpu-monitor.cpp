@@ -1,10 +1,7 @@
 #include "cpu-monitor.hpp"
 
-void CPUMonitor::Monitor() { ShowCPULoad_(); }
-
-void CPUMonitor::ShowCPULoad_() {
+void CPUMonitor::Monitor() {
   std::vector<std::string> lines = GetLines_();
-
   ShowTotalCPUUsage_(lines);
 }
 
@@ -14,7 +11,7 @@ std::vector<std::string> CPUMonitor::GetLines_() {
   std::vector<std::string> lines;
   std::string line;
   while (std::getline(file, line)) {
-    if (line.at(0) == 'c' && line.at(1) == 'p' && line.at(2) == 'u') {
+    if (line.rfind("cpu", 0) == 0) {
       lines.emplace_back(line);
     }
   }
@@ -45,8 +42,8 @@ std::vector<std::string> CPUMonitor::SplitLine_(const std::string& line) {
     if (c == ' ') {
       if (tmp != "") {
         line_split.emplace_back(tmp);
+        tmp = "";
       }
-      tmp = "";
       continue;
     }
     tmp += c;
@@ -62,16 +59,13 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string>& lines) {
   }
 
   if (first_time) {
-    for (auto cpu_stat : cpu_stat_current_vector) {
-      cpu_stat_prev_vector.emplace_back(cpu_stat);
-    }
+    cpu_stat_prev_vector = std::move(cpu_stat_current_vector);
     first_time = false;
     return;
   }
 
   printf("=== CPU Monitor ===\n");
 
-  // get total
   for (size_t i = 0; i < cpu_stat_current_vector.size(); ++i) {
     int total_diff = GetTotalLoad_(cpu_stat_current_vector.at(i)) -
                      GetTotalLoad_(cpu_stat_prev_vector.at(i));
@@ -84,12 +78,7 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string>& lines) {
            cpu_stat_current_vector.at(i).cpu_name.c_str(), cpu_usage);
   }
 
-  fflush(stdout);
-
-  // update
-  for (size_t i = 0; i < cpu_stat_current_vector.size(); ++i) {
-    cpu_stat_prev_vector.at(i) = cpu_stat_current_vector.at(i);
-  }
+  cpu_stat_prev_vector = std::move(cpu_stat_current_vector);
 }
 
 int CPUMonitor::GetTotalLoad_(const CPUStat& cpu_stat) {

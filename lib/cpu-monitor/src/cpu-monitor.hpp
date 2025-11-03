@@ -28,7 +28,6 @@ class CPUMonitor {
   void Monitor();
 
  private:
-  void ShowCPULoad_();
   std::vector<std::string> GetLines_();
   CPUStat GetCPUStat_(const std::string& line);
   std::vector<std::string> SplitLine_(const std::string& line);
