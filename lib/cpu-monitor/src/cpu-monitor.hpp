@@ -38,9 +38,9 @@ class CPUMonitor {
 
   // variables
   const std::string path{"/proc/stat"};
-  bool time_zero{true};
+  bool first_time{true};
+  std::vector<CPUStat> cpu_stat_current_vector{};
   std::vector<CPUStat> cpu_stat_prev_vector{};
-  std::vector<CPUStat> cpu_stat_now_vector{};
 };
 
 #endif

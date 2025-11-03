@@ -56,39 +56,39 @@ std::vector<std::string> CPUMonitor::SplitLine_(const std::string& line) {
 }
 
 void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string>& lines) {
-  std::vector<CPUStat> cpu_stat_now_vector;
+  std::vector<CPUStat> cpu_stat_current_vector;
   for (auto line : lines) {
-    cpu_stat_now_vector.emplace_back(GetCPUStat_(line));
+    cpu_stat_current_vector.emplace_back(GetCPUStat_(line));
   }
 
-  if (time_zero) {
-    for (auto cpu_stat : cpu_stat_now_vector) {
+  if (first_time) {
+    for (auto cpu_stat : cpu_stat_current_vector) {
       cpu_stat_prev_vector.emplace_back(cpu_stat);
     }
-    time_zero = false;
+    first_time = false;
     return;
   }
 
   printf("=== CPU Monitor ===\n");
 
   // get total
-  for (size_t i = 0; i < cpu_stat_now_vector.size(); ++i) {
-    int total_diff = GetTotalLoad_(cpu_stat_now_vector.at(i)) -
+  for (size_t i = 0; i < cpu_stat_current_vector.size(); ++i) {
+    int total_diff = GetTotalLoad_(cpu_stat_current_vector.at(i)) -
                      GetTotalLoad_(cpu_stat_prev_vector.at(i));
     int idle_diff =
-        cpu_stat_now_vector.at(i).idle - cpu_stat_prev_vector.at(i).idle;
+        cpu_stat_current_vector.at(i).idle - cpu_stat_prev_vector.at(i).idle;
 
     double cpu_usage = 100 * (total_diff - idle_diff) / (double)total_diff;
 
-    printf("%s: %.2f[%%]\033[K\n", cpu_stat_now_vector.at(i).cpu_name.c_str(),
-           cpu_usage);
+    printf("%s: %.2f[%%]\033[K\n",
+           cpu_stat_current_vector.at(i).cpu_name.c_str(), cpu_usage);
   }
 
   fflush(stdout);
 
   // update
-  for (size_t i = 0; i < cpu_stat_now_vector.size(); ++i) {
-    cpu_stat_prev_vector.at(i) = cpu_stat_now_vector.at(i);
+  for (size_t i = 0; i < cpu_stat_current_vector.size(); ++i) {
+    cpu_stat_prev_vector.at(i) = cpu_stat_current_vector.at(i);
   }
 }
 
