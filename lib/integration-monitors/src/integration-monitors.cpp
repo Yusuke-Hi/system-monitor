@@ -7,16 +7,10 @@ void IntegrationMonitors::StartMonitoring() {
   MemoryMonitor memory_monitor;
   DiskIOMonitor diskio_monitor;
 
-  bool first{true};
-
   while (true) {
     printf("\033[H");
 
     cpu_monitor.Monitor();
-    if (first) {
-      first = false;
-      continue;
-    }
     memory_monitor.Monitor();
     diskio_monitor.Monitor();
 

@@ -22,7 +22,7 @@ std::vector<std::string> CPUMonitor::GetLines_() {
   return lines;
 }
 
-CPUStat CPUMonitor::GetCPUStat_(const std::string &line) {
+CPUStat CPUMonitor::GetCPUStat_(const std::string& line) {
   std::vector<std::string> line_split = SplitLine_(line);
 
   CPUStat cpu_stat{};
@@ -38,7 +38,7 @@ CPUStat CPUMonitor::GetCPUStat_(const std::string &line) {
   return cpu_stat;
 }
 
-std::vector<std::string> CPUMonitor::SplitLine_(const std::string &line) {
+std::vector<std::string> CPUMonitor::SplitLine_(const std::string& line) {
   std::vector<std::string> line_split;
   std::string tmp = "";
   for (auto c : line) {
@@ -55,7 +55,7 @@ std::vector<std::string> CPUMonitor::SplitLine_(const std::string &line) {
   return line_split;
 }
 
-void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string> &lines) {
+void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string>& lines) {
   std::vector<CPUStat> cpu_stat_now_vector;
   for (auto line : lines) {
     cpu_stat_now_vector.emplace_back(GetCPUStat_(line));
@@ -80,7 +80,7 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string> &lines) {
 
     double cpu_usage = 100 * (total_diff - idle_diff) / (double)total_diff;
 
-    printf("%s: %.2f[%%]\n", cpu_stat_now_vector.at(i).cpu_name.c_str(),
+    printf("%s: %.2f[%%]\033[K\n", cpu_stat_now_vector.at(i).cpu_name.c_str(),
            cpu_usage);
   }
 
@@ -92,7 +92,7 @@ void CPUMonitor::ShowTotalCPUUsage_(const std::vector<std::string> &lines) {
   }
 }
 
-int CPUMonitor::GetTotalLoad_(const CPUStat &cpu_stat) {
+int CPUMonitor::GetTotalLoad_(const CPUStat& cpu_stat) {
   return cpu_stat.user + cpu_stat.nice + cpu_stat.system + cpu_stat.idle +
          cpu_stat.iowait + cpu_stat.irq + cpu_stat.softirq;
 }
