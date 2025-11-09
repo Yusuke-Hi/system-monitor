@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 struct DiskIOInfo {
@@ -36,8 +37,8 @@ class DiskIOMonitor {
   const std::string path{"/proc/diskstats"};
   bool first_time{true};
   std::vector<std::string> target_names{"sda", "sdb", "sdc", "sdd"};
-  std::vector<DiskIOInfo> diskio_info_prev_vector{};
-  std::vector<DiskIOInfo> diskio_info_current_vector{};
+  std::unordered_map<std::string, DiskIOInfo> diskio_info_prev_map{};
+  std::unordered_map<std::string, DiskIOInfo> diskio_info_current_map{};
 };
 
 #endif

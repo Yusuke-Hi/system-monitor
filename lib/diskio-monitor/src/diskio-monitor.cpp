@@ -6,39 +6,36 @@ constexpr double OneKiloByte{1024.0};
 void DiskIOMonitor::Monitor() {
   std::vector<std::string> lines = GetLines_();
   for (auto line : lines) {
-    diskio_info_current_vector.push_back(GetDiskIOInfo_(line));
+    auto diskio_info = GetDiskIOInfo_(line);
+    diskio_info_current_map.emplace(diskio_info.name, diskio_info);
   }
 
   if (first_time) {
-    diskio_info_prev_vector = std::move(diskio_info_current_vector);
+    diskio_info_prev_map = std::move(diskio_info_current_map);
     first_time = false;
     return;
   }
 
   printf("=== DiskIO Monitor ===\n");
 
-  for (int i = 0; i < diskio_info_current_vector.size(); ++i) {
-    for (auto target_name : target_names) {
-      if (diskio_info_current_vector.at(i).name == target_name) {
-        int sectors_read_diff = diskio_info_current_vector.at(i).sectors_read -
-                                diskio_info_prev_vector.at(i).sectors_read;
-        int sectors_written_diff =
-            diskio_info_current_vector.at(i).sectors_written -
-            diskio_info_prev_vector.at(i).sectors_written;
+  for (auto target_name : target_names) {
+    int sectors_read_diff =
+        diskio_info_current_map.at(target_name).sectors_read -
+        diskio_info_prev_map.at(target_name).sectors_read;
+    int sectors_written_diff =
+        diskio_info_current_map.at(target_name).sectors_written -
+        diskio_info_prev_map.at(target_name).sectors_written;
 
-        long long bytes_read = sectors_read_diff * BytesInSector;
-        long long bytes_written = sectors_written_diff * BytesInSector;
+    long long bytes_read = sectors_read_diff * BytesInSector;
+    long long bytes_written = sectors_written_diff * BytesInSector;
 
-        double read_kb_per_sec = bytes_read / OneKiloByte;
-        double written_kb_per_sec = bytes_written / OneKiloByte;
-        printf("%s: Read: %f KB/s, Write: %f KB/s\033[K\n",
-               diskio_info_current_vector.at(i).name.c_str(), read_kb_per_sec,
-               written_kb_per_sec);
-      }
-    }
+    double read_kb_per_sec = bytes_read / OneKiloByte;
+    double written_kb_per_sec = bytes_written / OneKiloByte;
+    printf("%s: Read: %f KB/s, Write: %f KB/s\033[K\n", target_name.c_str(),
+           read_kb_per_sec, written_kb_per_sec);
   }
 
-  diskio_info_prev_vector = std::move(diskio_info_current_vector);
+  diskio_info_prev_map = std::move(diskio_info_current_map);
 }
 
 std::vector<std::string> DiskIOMonitor::GetLines_() {
