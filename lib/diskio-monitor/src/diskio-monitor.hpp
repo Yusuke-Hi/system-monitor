@@ -28,16 +28,16 @@ class DiskIOMonitor {
   void Monitor();
 
  private:
-  void ShowDiskIO_();
   std::vector<std::string> GetLines_();
   DiskIOInfo GetDiskIOInfo_(const std::string& line);
   std::vector<std::string> SplitLine_(const std::string& line);
+  void ShowDiskIOInfo();
 
   const std::string path{"/proc/diskstats"};
   bool first_time{true};
   std::vector<std::string> target_names{"sda", "sdb", "sdc", "sdd"};
   std::vector<DiskIOInfo> diskio_info_prev_vector{};
-  std::vector<DiskIOInfo> diskio_info_now_vector{};
+  std::vector<DiskIOInfo> diskio_info_current_vector{};
 };
 
 #endif

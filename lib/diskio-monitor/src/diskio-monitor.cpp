@@ -1,43 +1,44 @@
 #include "diskio-monitor.hpp"
 
-void DiskIOMonitor::Monitor() { ShowDiskIO_(); }
+constexpr uint32_t BytesInSector{512};
+constexpr double OneKiloByte{1024.0};
 
-void DiskIOMonitor::ShowDiskIO_() {
+void DiskIOMonitor::Monitor() {
   std::vector<std::string> lines = GetLines_();
   for (auto line : lines) {
-    diskio_info_now_vector.push_back(GetDiskIOInfo_(line));
+    diskio_info_current_vector.push_back(GetDiskIOInfo_(line));
   }
 
   if (first_time) {
-    diskio_info_prev_vector = std::move(diskio_info_now_vector);
+    diskio_info_prev_vector = std::move(diskio_info_current_vector);
     first_time = false;
     return;
   }
 
   printf("=== DiskIO Monitor ===\n");
 
-  for (int i = 0; i < diskio_info_now_vector.size(); ++i) {
+  for (int i = 0; i < diskio_info_current_vector.size(); ++i) {
     for (auto target_name : target_names) {
-      if (diskio_info_now_vector.at(i).name == target_name) {
-        int sectors_read_diff = diskio_info_now_vector.at(i).sectors_read -
+      if (diskio_info_current_vector.at(i).name == target_name) {
+        int sectors_read_diff = diskio_info_current_vector.at(i).sectors_read -
                                 diskio_info_prev_vector.at(i).sectors_read;
         int sectors_written_diff =
-            diskio_info_now_vector.at(i).sectors_written -
+            diskio_info_current_vector.at(i).sectors_written -
             diskio_info_prev_vector.at(i).sectors_written;
 
-        long long bytes_read = sectors_read_diff * 512;
-        long long bytes_written = sectors_written_diff * 512;
+        long long bytes_read = sectors_read_diff * BytesInSector;
+        long long bytes_written = sectors_written_diff * BytesInSector;
 
-        double read_kb_per_sec = bytes_read / 1024.0;
-        double written_kb_per_sec = bytes_written / 1024.0;
+        double read_kb_per_sec = bytes_read / OneKiloByte;
+        double written_kb_per_sec = bytes_written / OneKiloByte;
         printf("%s: Read: %f KB/s, Write: %f KB/s\033[K\n",
-               diskio_info_now_vector.at(i).name.c_str(), read_kb_per_sec,
+               diskio_info_current_vector.at(i).name.c_str(), read_kb_per_sec,
                written_kb_per_sec);
       }
     }
   }
 
-  diskio_info_prev_vector = std::move(diskio_info_now_vector);
+  diskio_info_prev_vector = std::move(diskio_info_current_vector);
 }
 
 std::vector<std::string> DiskIOMonitor::GetLines_() {
@@ -74,7 +75,6 @@ DiskIOInfo DiskIOMonitor::GetDiskIOInfo_(const std::string& line) {
 std::vector<std::string> DiskIOMonitor::SplitLine_(const std::string& line) {
   std::vector<std::string> line_split{};
   std::string tmp{};
-  int i = 0;
   for (auto c : line) {
     if (c == ' ') {
       if (tmp != "") {
